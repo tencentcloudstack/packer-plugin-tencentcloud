@@ -13,6 +13,7 @@ import (
 
 func testConfig() *TencentCloudRunConfig {
 	return &TencentCloudRunConfig{
+		Zone:          "ap-guangzhou",
 		SourceImageId: "img-qwer1234",
 		InstanceType:  "S3.SMALL2",
 		Comm: communicator.Config{
