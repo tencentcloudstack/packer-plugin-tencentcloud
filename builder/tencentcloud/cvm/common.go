@@ -109,6 +109,30 @@ func GetImageByName(ctx context.Context, client *cvm.Client, imageName string) (
 	return nil, nil
 }
 
+// GetImages
+func GetImages(ctx context.Context, client *cvm.Client, filters []*cvm.Filter) ([]*cvm.Image, error) {
+	req := cvm.NewDescribeImagesRequest()
+	if len(filters) > 0 {
+		req.Filters = filters
+	}
+
+	var resp *cvm.DescribeImagesResponse
+	err := Retry(ctx, func(ctx context.Context) error {
+		var e error
+		resp, e = client.DescribeImages(req)
+		return e
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if *resp.Response.TotalCount > 0 {
+		return resp.Response.ImageSet, nil
+	}
+
+	return nil, nil
+}
+
 // NewCvmClient returns a new cvm client
 func NewCvmClient(cf *TencentCloudAccessConfig) (client *cvm.Client, err error) {
 	apiV3Conn, err := packerConfigClient(cf)

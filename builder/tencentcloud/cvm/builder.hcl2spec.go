@@ -22,7 +22,6 @@ type FlatConfig struct {
 	SecretId                  *string                     `mapstructure:"secret_id" required:"true" cty:"secret_id" hcl:"secret_id"`
 	SecretKey                 *string                     `mapstructure:"secret_key" required:"true" cty:"secret_key" hcl:"secret_key"`
 	Region                    *string                     `mapstructure:"region" required:"true" cty:"region" hcl:"region"`
-	Zone                      *string                     `mapstructure:"zone" required:"true" cty:"zone" hcl:"zone"`
 	CvmEndpoint               *string                     `mapstructure:"cvm_endpoint" required:"false" cty:"cvm_endpoint" hcl:"cvm_endpoint"`
 	VpcEndpoint               *string                     `mapstructure:"vpc_endpoint" required:"false" cty:"vpc_endpoint" hcl:"vpc_endpoint"`
 	SecurityToken             *string                     `mapstructure:"security_token" required:"false" cty:"security_token" hcl:"security_token"`
@@ -114,6 +113,7 @@ type FlatConfig struct {
 	WinRMInsecure             *bool                       `mapstructure:"winrm_insecure" cty:"winrm_insecure" hcl:"winrm_insecure"`
 	WinRMUseNTLM              *bool                       `mapstructure:"winrm_use_ntlm" cty:"winrm_use_ntlm" hcl:"winrm_use_ntlm"`
 	SSHPrivateIp              *bool                       `mapstructure:"ssh_private_ip" cty:"ssh_private_ip" hcl:"ssh_private_ip"`
+	Zone                      *string                     `mapstructure:"zone" required:"true" cty:"zone" hcl:"zone"`
 	SkipRegionValidation      *bool                       `mapstructure:"skip_region_validation" required:"false" cty:"skip_region_validation" hcl:"skip_region_validation"`
 }
 
@@ -140,7 +140,6 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"secret_id":                    &hcldec.AttrSpec{Name: "secret_id", Type: cty.String, Required: false},
 		"secret_key":                   &hcldec.AttrSpec{Name: "secret_key", Type: cty.String, Required: false},
 		"region":                       &hcldec.AttrSpec{Name: "region", Type: cty.String, Required: false},
-		"zone":                         &hcldec.AttrSpec{Name: "zone", Type: cty.String, Required: false},
 		"cvm_endpoint":                 &hcldec.AttrSpec{Name: "cvm_endpoint", Type: cty.String, Required: false},
 		"vpc_endpoint":                 &hcldec.AttrSpec{Name: "vpc_endpoint", Type: cty.String, Required: false},
 		"security_token":               &hcldec.AttrSpec{Name: "security_token", Type: cty.String, Required: false},
@@ -232,6 +231,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"winrm_insecure":               &hcldec.AttrSpec{Name: "winrm_insecure", Type: cty.Bool, Required: false},
 		"winrm_use_ntlm":               &hcldec.AttrSpec{Name: "winrm_use_ntlm", Type: cty.Bool, Required: false},
 		"ssh_private_ip":               &hcldec.AttrSpec{Name: "ssh_private_ip", Type: cty.Bool, Required: false},
+		"zone":                         &hcldec.AttrSpec{Name: "zone", Type: cty.String, Required: false},
 		"skip_region_validation":       &hcldec.AttrSpec{Name: "skip_region_validation", Type: cty.Bool, Required: false},
 	}
 	return s

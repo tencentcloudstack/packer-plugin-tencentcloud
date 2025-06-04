@@ -109,6 +109,10 @@ type TencentCloudRunConfig struct {
 	// Communicator settings
 	Comm         communicator.Config `mapstructure:",squash"`
 	SSHPrivateIp bool                `mapstructure:"ssh_private_ip"`
+	// The zone where your cvm will be launch. You should
+	// reference [Region and Zone](https://intl.cloud.tencent.com/document/product/213/6091)
+	// for parameter taking.
+	Zone string `mapstructure:"zone" required:"true"`
 }
 
 var ValidCBSType = []string{
@@ -125,6 +129,10 @@ func (cf *TencentCloudRunConfig) Prepare(ctx *interpolate.Context) []error {
 	}
 
 	errs := cf.Comm.Prepare(ctx)
+	if cf.Zone == "" {
+		errs = append(errs, errors.New("zone must be specified"))
+	}
+
 	if cf.SourceImageId == "" && cf.SourceImageName == "" {
 		errs = append(errs, errors.New("source_image_id or source_image_name must be specified"))
 	}
