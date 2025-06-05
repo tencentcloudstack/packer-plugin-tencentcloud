@@ -105,7 +105,7 @@ func (d *Datasource) Execute() (cty.Value, error) {
 }
 
 func (d *Datasource) ResolveImageByFilters() (*cvm.Image, error) {
-	client, _, err := d.config.Client()
+	client, _, _, err := d.config.Client()
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (d *Datasource) ResolveImageByFilters() (*cvm.Image, error) {
 }
 
 func (d *Datasource) ResolveImageByImageFamily() (*cvm.Image, error) {
-	client, _, err := d.config.Client()
+	client, _, _, err := d.config.Client()
 	if err != nil {
 		return nil, err
 	}

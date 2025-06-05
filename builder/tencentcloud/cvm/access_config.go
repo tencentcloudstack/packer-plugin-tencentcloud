@@ -13,6 +13,7 @@ import (
 
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
 	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
+	tag "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tag/v20180813"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 )
 
@@ -81,6 +82,9 @@ type TencentCloudAccessConfig struct {
 	// The endpoint you want to reach the cloud endpoint,
 	// if tce cloud you should set a tce vpc endpoint.
 	VpcEndpoint string `mapstructure:"vpc_endpoint" required:"false"`
+	// The endpoint you want to reach the cloud endpoint,
+	// if tce cloud you should set a tce tag endpoint.
+	TagEndpoint string `mapstructure:"tag_endpoint" required:"false"`
 	// The region validation can be skipped if this value is true, the default
 	// value is false.
 	skipValidation bool
@@ -121,26 +125,31 @@ type TencentCloudAccessRole struct {
 	SessionDuration int `mapstructure:"session_duration" required:"false"`
 }
 
-func (cf *TencentCloudAccessConfig) Client() (*cvm.Client, *vpc.Client, error) {
+func (cf *TencentCloudAccessConfig) Client() (*cvm.Client, *vpc.Client, *tag.Client, error) {
 	var (
 		err        error
 		cvm_client *cvm.Client
 		vpc_client *vpc.Client
+		tag_client *tag.Client
 	)
 
 	if err = cf.validateRegion(); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	if cvm_client, err = NewCvmClient(cf); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	if vpc_client, err = NewVpcClient(cf); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	return cvm_client, vpc_client, nil
+	if tag_client, err = NewTagClient(cf); err != nil {
+		return nil, nil, nil, err
+	}
+
+	return cvm_client, vpc_client, tag_client, nil
 }
 
 func (cf *TencentCloudAccessConfig) Prepare(ctx *interpolate.Context) []error {
@@ -150,9 +159,8 @@ func (cf *TencentCloudAccessConfig) Prepare(ctx *interpolate.Context) []error {
 		errs = append(errs, err)
 	}
 
-	if (cf.CvmEndpoint != "" && cf.VpcEndpoint == "") ||
-		(cf.CvmEndpoint == "" && cf.VpcEndpoint != "") {
-		errs = append(errs, fmt.Errorf("parameter cvm_endpoint and vpc_endpoint must be set simultaneously"))
+	if cf.CvmEndpoint == "" || cf.VpcEndpoint == "" || cf.TagEndpoint == "" {
+		errs = append(errs, fmt.Errorf("parameter cvm_endpoint, vpc_endpoint and tag_endpoint must be set simultaneously"))
 	}
 
 	if cf.Region == "" {

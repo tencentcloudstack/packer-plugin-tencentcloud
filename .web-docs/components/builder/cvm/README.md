@@ -59,6 +59,9 @@ a [communicator](/packer/docs/templates/legacy_json_templates/communicator) can 
 - `vpc_endpoint` (string) - The endpoint you want to reach the cloud endpoint,
   if tce cloud you should set a tce vpc endpoint.
 
+- `tag_endpoint` (string) - The endpoint you want to reach the cloud endpoint,
+  if tce cloud you should set a tce tag endpoint.
+
 - `security_token` (string) - STS access token, can be set through template or by exporting
   as environment variable such as `export TENCENTCLOUD_SECURITY_TOKEN=value`.
 
@@ -100,6 +103,8 @@ a [communicator](/packer/docs/templates/legacy_json_templates/communicator) can 
   after your image created.
 
 - `image_tags` (map[string]string) - Key/value pair tags that will be applied to the resulting image.
+
+- `snapshot_tags` (map[string]string) - Snapshot Tags
 
 - `skip_create_image` (bool) - Skip creating an image. When set to true, you don't need to enter target image information, share, copy, etc. The default value is false.
 
