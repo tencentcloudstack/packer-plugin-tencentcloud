@@ -19,6 +19,7 @@ import (
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
 	sts "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts/v20180813"
+	tag "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tag/v20180813"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 )
 
@@ -76,6 +77,27 @@ func WaitForImageReady(ctx context.Context, client *cvm.Client, imageName string
 			return fmt.Errorf("wait image(%s) status(%s) timeout", imageName, status)
 		}
 	}
+}
+
+func AddResourceTag(ctx context.Context, client *tag.Client, resourceName string, tags map[string]string) error {
+	request := tag.NewModifyResourceTagsRequest()
+	request.Resource = &resourceName
+	request.ReplaceTags = make([]*tag.Tag, 0, len(tags))
+	for k, v := range tags {
+		key := k
+		value := v
+		replaceTag := &tag.Tag{
+			TagKey:   &key,
+			TagValue: &value,
+		}
+		request.ReplaceTags = append(request.ReplaceTags, replaceTag)
+	}
+
+	err := Retry(ctx, func(ctx context.Context) error {
+		_, e := client.ModifyResourceTags(request)
+		return e
+	})
+	return err
 }
 
 // GetImageByName get image by image name
@@ -139,6 +161,22 @@ func NewVpcClient(cf *TencentCloudAccessConfig) (client *vpc.Client, err error) 
 	}
 
 	client = apiV3Conn.UseVpcClient(vpcClientProfile)
+
+	return
+}
+
+// UseTagClient returns a new tag client
+func NewTagClient(cf *TencentCloudAccessConfig) (client *tag.Client, err error) {
+	apiV3Conn, err := packerConfigClient(cf)
+	if err != nil {
+		return nil, err
+	}
+
+	tagClientProfile, err := newClientProfile(cf.TagEndpoint)
+	if err != nil {
+		return nil, err
+	}
+	client = apiV3Conn.UseTagClient(tagClientProfile)
 
 	return
 }
@@ -321,4 +359,11 @@ func genClientWithSTS(apiV3Conn *TencentCloudClient, assumeRoleArn, assumeRoleSe
 func IntUint64(i int) *uint64 {
 	u := uint64(i)
 	return &u
+}
+
+// BuildTagResourceName builds the Tencent Cloud specific name of a resource description.
+// The format is `qcs:project_id:service_type:region:account:resource`.
+// For more information, go to https://cloud.tencent.com/document/product/598/10606.
+func BuildTagResourceName(serviceType, resourceType, region, id string) string {
+	return fmt.Sprintf("qcs::%s:%s:uin/:%s/%s", serviceType, region, resourceType, id)
 }

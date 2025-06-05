@@ -75,7 +75,7 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 }
 
 func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook) (packersdk.Artifact, error) {
-	cvmClient, vpcClient, err := b.config.Client()
+	cvmClient, vpcClient, tagClient, err := b.config.Client()
 	if err != nil {
 		return nil, err
 	}
@@ -84,6 +84,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	state.Put("config", &b.config)
 	state.Put("cvm_client", cvmClient)
 	state.Put("vpc_client", vpcClient)
+	state.Put("tag_client", tagClient)
 	state.Put("hook", hook)
 	state.Put("ui", ui)
 

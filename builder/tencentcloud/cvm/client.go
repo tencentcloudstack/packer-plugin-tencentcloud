@@ -8,6 +8,7 @@ import (
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
 	sts "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts/v20180813"
+	tag "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tag/v20180813"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 )
 
@@ -20,6 +21,7 @@ type TencentCloudClient struct {
 	vpcConn *vpc.Client
 	cvmConn *cvm.Client
 	stsConn *sts.Client
+	tagConn *tag.Client
 }
 
 func (me *TencentCloudClient) UseVpcClient(cpf *profile.ClientProfile) *vpc.Client {
@@ -52,4 +54,14 @@ func (me *TencentCloudClient) UseStsClient() *sts.Client {
 	me.stsConn, _ = sts.NewClient(me.Credential, me.Region, cpf)
 
 	return me.stsConn
+}
+
+func (me *TencentCloudClient) UseTagClient(cpf *profile.ClientProfile) *tag.Client {
+	if me.tagConn != nil {
+		return me.tagConn
+	}
+
+	me.tagConn, _ = tag.NewClient(me.Credential, me.Region, cpf)
+
+	return me.tagConn
 }

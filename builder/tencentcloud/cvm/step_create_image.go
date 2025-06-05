@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
+	tag "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tag/v20180813"
 )
 
 type stepCreateImage struct {
@@ -18,6 +19,7 @@ type stepCreateImage struct {
 
 func (s *stepCreateImage) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
 	client := state.Get("cvm_client").(*cvm.Client)
+	tagClient := state.Get("tag_client").(*tag.Client)
 
 	config := state.Get("config").(*Config)
 	instance := state.Get("instance").(*cvm.Instance)
@@ -105,6 +107,20 @@ func (s *stepCreateImage) Run(ctx context.Context, state multistep.StateBag) mul
 	s.imageId = *image.ImageId
 	state.Put("image", image)
 	Message(state, s.imageId, "Image created")
+
+	snapshotTags := config.SnapshotTags
+	if len(snapshotTags) > 0 {
+		for _, snapshot := range image.SnapshotSet {
+			if snapshot == nil || snapshot.SnapshotId == nil {
+				return Halt(state, err, "snapshot or snapshotId is nil")
+			}
+			resourceName := BuildTagResourceName("cvm", "snapshot", config.Region, *snapshot.SnapshotId)
+			err := AddResourceTag(ctx, tagClient, resourceName, snapshotTags)
+			if err != nil {
+				return Halt(state, err, fmt.Sprintf("Failed to set tag for snapshot(%s)", *snapshot.SnapshotId))
+			}
+		}
+	}
 
 	tencentCloudImages := make(map[string]string)
 	tencentCloudImages[config.Region] = s.imageId

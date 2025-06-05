@@ -22,9 +22,9 @@ type FlatConfig struct {
 	SecretId                  *string                     `mapstructure:"secret_id" required:"true" cty:"secret_id" hcl:"secret_id"`
 	SecretKey                 *string                     `mapstructure:"secret_key" required:"true" cty:"secret_key" hcl:"secret_key"`
 	Region                    *string                     `mapstructure:"region" required:"true" cty:"region" hcl:"region"`
-	Zone                      *string                     `mapstructure:"zone" required:"true" cty:"zone" hcl:"zone"`
 	CvmEndpoint               *string                     `mapstructure:"cvm_endpoint" required:"false" cty:"cvm_endpoint" hcl:"cvm_endpoint"`
 	VpcEndpoint               *string                     `mapstructure:"vpc_endpoint" required:"false" cty:"vpc_endpoint" hcl:"vpc_endpoint"`
+	TagEndpoint               *string                     `mapstructure:"tag_endpoint" required:"false" cty:"tag_endpoint" hcl:"tag_endpoint"`
 	SecurityToken             *string                     `mapstructure:"security_token" required:"false" cty:"security_token" hcl:"security_token"`
 	AssumeRole                *FlatTencentCloudAccessRole `mapstructure:"assume_role" required:"false" cty:"assume_role" hcl:"assume_role"`
 	Profile                   *string                     `mapstructure:"profile" required:"false" cty:"profile" hcl:"profile"`
@@ -36,6 +36,7 @@ type FlatConfig struct {
 	ImageCopyRegions          []string                    `mapstructure:"image_copy_regions" required:"false" cty:"image_copy_regions" hcl:"image_copy_regions"`
 	ImageShareAccounts        []string                    `mapstructure:"image_share_accounts" required:"false" cty:"image_share_accounts" hcl:"image_share_accounts"`
 	ImageTags                 map[string]string           `mapstructure:"image_tags" required:"false" cty:"image_tags" hcl:"image_tags"`
+	SnapshotTags              map[string]string           `mapstructure:"snapshot_tags" required:"false" cty:"snapshot_tags" hcl:"snapshot_tags"`
 	SkipCreateImage           *bool                       `mapstructure:"skip_create_image" required:"false" cty:"skip_create_image" hcl:"skip_create_image"`
 	AssociatePublicIpAddress  *bool                       `mapstructure:"associate_public_ip_address" required:"false" cty:"associate_public_ip_address" hcl:"associate_public_ip_address"`
 	SourceImageId             *string                     `mapstructure:"source_image_id" required:"false" cty:"source_image_id" hcl:"source_image_id"`
@@ -114,6 +115,7 @@ type FlatConfig struct {
 	WinRMInsecure             *bool                       `mapstructure:"winrm_insecure" cty:"winrm_insecure" hcl:"winrm_insecure"`
 	WinRMUseNTLM              *bool                       `mapstructure:"winrm_use_ntlm" cty:"winrm_use_ntlm" hcl:"winrm_use_ntlm"`
 	SSHPrivateIp              *bool                       `mapstructure:"ssh_private_ip" cty:"ssh_private_ip" hcl:"ssh_private_ip"`
+	Zone                      *string                     `mapstructure:"zone" required:"true" cty:"zone" hcl:"zone"`
 	SkipRegionValidation      *bool                       `mapstructure:"skip_region_validation" required:"false" cty:"skip_region_validation" hcl:"skip_region_validation"`
 }
 
@@ -140,9 +142,9 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"secret_id":                    &hcldec.AttrSpec{Name: "secret_id", Type: cty.String, Required: false},
 		"secret_key":                   &hcldec.AttrSpec{Name: "secret_key", Type: cty.String, Required: false},
 		"region":                       &hcldec.AttrSpec{Name: "region", Type: cty.String, Required: false},
-		"zone":                         &hcldec.AttrSpec{Name: "zone", Type: cty.String, Required: false},
 		"cvm_endpoint":                 &hcldec.AttrSpec{Name: "cvm_endpoint", Type: cty.String, Required: false},
 		"vpc_endpoint":                 &hcldec.AttrSpec{Name: "vpc_endpoint", Type: cty.String, Required: false},
+		"tag_endpoint":                 &hcldec.AttrSpec{Name: "tag_endpoint", Type: cty.String, Required: false},
 		"security_token":               &hcldec.AttrSpec{Name: "security_token", Type: cty.String, Required: false},
 		"assume_role":                  &hcldec.BlockSpec{TypeName: "assume_role", Nested: hcldec.ObjectSpec((*FlatTencentCloudAccessRole)(nil).HCL2Spec())},
 		"profile":                      &hcldec.AttrSpec{Name: "profile", Type: cty.String, Required: false},
@@ -154,6 +156,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"image_copy_regions":           &hcldec.AttrSpec{Name: "image_copy_regions", Type: cty.List(cty.String), Required: false},
 		"image_share_accounts":         &hcldec.AttrSpec{Name: "image_share_accounts", Type: cty.List(cty.String), Required: false},
 		"image_tags":                   &hcldec.AttrSpec{Name: "image_tags", Type: cty.Map(cty.String), Required: false},
+		"snapshot_tags":                &hcldec.AttrSpec{Name: "snapshot_tags", Type: cty.Map(cty.String), Required: false},
 		"skip_create_image":            &hcldec.AttrSpec{Name: "skip_create_image", Type: cty.Bool, Required: false},
 		"associate_public_ip_address":  &hcldec.AttrSpec{Name: "associate_public_ip_address", Type: cty.Bool, Required: false},
 		"source_image_id":              &hcldec.AttrSpec{Name: "source_image_id", Type: cty.String, Required: false},
@@ -232,6 +235,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"winrm_insecure":               &hcldec.AttrSpec{Name: "winrm_insecure", Type: cty.Bool, Required: false},
 		"winrm_use_ntlm":               &hcldec.AttrSpec{Name: "winrm_use_ntlm", Type: cty.Bool, Required: false},
 		"ssh_private_ip":               &hcldec.AttrSpec{Name: "ssh_private_ip", Type: cty.Bool, Required: false},
+		"zone":                         &hcldec.AttrSpec{Name: "zone", Type: cty.String, Required: false},
 		"skip_region_validation":       &hcldec.AttrSpec{Name: "skip_region_validation", Type: cty.Bool, Required: false},
 	}
 	return s

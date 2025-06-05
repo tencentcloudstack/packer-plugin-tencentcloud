@@ -31,7 +31,9 @@ type TencentCloudImageConfig struct {
 	// after your image created.
 	ImageShareAccounts []string `mapstructure:"image_share_accounts" required:"false"`
 	// Key/value pair tags that will be applied to the resulting image.
-	ImageTags      map[string]string `mapstructure:"image_tags" required:"false"`
+	ImageTags map[string]string `mapstructure:"image_tags" required:"false"`
+	// Key/value pair tags that will be applied to snapshot.
+	SnapshotTags   map[string]string `mapstructure:"snapshot_tags" required:"false"`
 	skipValidation bool
 	// Skip creating an image. When set to true, you don't need to enter target image information, share, copy, etc. The default value is false.
 	SkipCreateImage bool `mapstructure:"skip_create_image" required:"false"`
@@ -78,6 +80,9 @@ func (cf *TencentCloudImageConfig) Prepare(ctx *interpolate.Context) []error {
 
 	if cf.ImageTags == nil {
 		cf.ImageTags = make(map[string]string)
+	}
+	if cf.SnapshotTags == nil {
+		cf.SnapshotTags = make(map[string]string)
 	}
 
 	if len(errs) > 0 {

@@ -7,13 +7,13 @@
 package cvm
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
 	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
+	tag "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tag/v20180813"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 )
 
@@ -76,16 +76,15 @@ type TencentCloudAccessConfig struct {
 	// reference [Region and Zone](https://intl.cloud.tencent.com/document/product/213/6091)
 	// for parameter taking.
 	Region string `mapstructure:"region" required:"true"`
-	// The zone where your cvm will be launch. You should
-	// reference [Region and Zone](https://intl.cloud.tencent.com/document/product/213/6091)
-	// for parameter taking.
-	Zone string `mapstructure:"zone" required:"true"`
 	// The endpoint you want to reach the cloud endpoint,
 	// if tce cloud you should set a tce cvm endpoint.
 	CvmEndpoint string `mapstructure:"cvm_endpoint" required:"false"`
 	// The endpoint you want to reach the cloud endpoint,
 	// if tce cloud you should set a tce vpc endpoint.
 	VpcEndpoint string `mapstructure:"vpc_endpoint" required:"false"`
+	// The endpoint you want to reach the cloud endpoint,
+	// if tce cloud you should set a tce tag endpoint.
+	TagEndpoint string `mapstructure:"tag_endpoint" required:"false"`
 	// The region validation can be skipped if this value is true, the default
 	// value is false.
 	skipValidation bool
@@ -126,47 +125,31 @@ type TencentCloudAccessRole struct {
 	SessionDuration int `mapstructure:"session_duration" required:"false"`
 }
 
-func (cf *TencentCloudAccessConfig) Client() (*cvm.Client, *vpc.Client, error) {
+func (cf *TencentCloudAccessConfig) Client() (*cvm.Client, *vpc.Client, *tag.Client, error) {
 	var (
 		err        error
 		cvm_client *cvm.Client
 		vpc_client *vpc.Client
-		resp       *cvm.DescribeZonesResponse
+		tag_client *tag.Client
 	)
 
 	if err = cf.validateRegion(); err != nil {
-		return nil, nil, err
-	}
-
-	if cf.Zone == "" {
-		return nil, nil, fmt.Errorf("parameter zone must be set")
+		return nil, nil, nil, err
 	}
 
 	if cvm_client, err = NewCvmClient(cf); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	if vpc_client, err = NewVpcClient(cf); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	ctx := context.TODO()
-	err = Retry(ctx, func(ctx context.Context) error {
-		var e error
-		resp, e = cvm_client.DescribeZones(nil)
-		return e
-	})
-	if err != nil {
-		return nil, nil, err
+	if tag_client, err = NewTagClient(cf); err != nil {
+		return nil, nil, nil, err
 	}
 
-	for _, zone := range resp.Response.ZoneSet {
-		if cf.Zone == *zone.Zone {
-			return cvm_client, vpc_client, nil
-		}
-	}
-
-	return nil, nil, fmt.Errorf("unknown zone: %s", cf.Zone)
+	return cvm_client, vpc_client, tag_client, nil
 }
 
 func (cf *TencentCloudAccessConfig) Prepare(ctx *interpolate.Context) []error {
@@ -176,9 +159,9 @@ func (cf *TencentCloudAccessConfig) Prepare(ctx *interpolate.Context) []error {
 		errs = append(errs, err)
 	}
 
-	if (cf.CvmEndpoint != "" && cf.VpcEndpoint == "") ||
-		(cf.CvmEndpoint == "" && cf.VpcEndpoint != "") {
-		errs = append(errs, fmt.Errorf("parameter cvm_endpoint and vpc_endpoint must be set simultaneously"))
+	if !((cf.CvmEndpoint == "" && cf.VpcEndpoint == "" && cf.TagEndpoint == "") ||
+		(cf.CvmEndpoint != "" && cf.VpcEndpoint != "" && cf.TagEndpoint != "")) {
+		errs = append(errs, fmt.Errorf("parameter cvm_endpoint, vpc_endpoint and tag_endpoint must be set simultaneously"))
 	}
 
 	if cf.Region == "" {
