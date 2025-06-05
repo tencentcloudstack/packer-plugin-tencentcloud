@@ -111,9 +111,14 @@ func (s *stepCreateImage) Run(ctx context.Context, state multistep.StateBag) mul
 	snapshotTags := config.SnapshotTags
 	if len(snapshotTags) > 0 {
 		for _, snapshot := range image.SnapshotSet {
+			if snapshot == nil || snapshot.SnapshotId == nil {
+				return Halt(state, err, "snapshot or snapshotId is nil")
+			}
 			resourceName := BuildTagResourceName("cvm", "snapshot", config.Region, *snapshot.SnapshotId)
 			err := AddResourceTag(ctx, tagClient, resourceName, snapshotTags)
-			return Halt(state, err, "Failed to set tag for snapshot")
+			if err != nil {
+				return Halt(state, err, fmt.Sprintf("Failed to set tag for snapshot(%s)", *snapshot.SnapshotId))
+			}
 		}
 	}
 

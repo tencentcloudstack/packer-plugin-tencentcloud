@@ -31,7 +31,8 @@ type TencentCloudImageConfig struct {
 	// after your image created.
 	ImageShareAccounts []string `mapstructure:"image_share_accounts" required:"false"`
 	// Key/value pair tags that will be applied to the resulting image.
-	ImageTags      map[string]string `mapstructure:"image_tags" required:"false"`
+	ImageTags map[string]string `mapstructure:"image_tags" required:"false"`
+	// Key/value pair tags that will be applied to snapshot.
 	SnapshotTags   map[string]string `mapstructure:"snapshot_tags" required:"false"`
 	skipValidation bool
 	// Skip creating an image. When set to true, you don't need to enter target image information, share, copy, etc. The default value is false.
