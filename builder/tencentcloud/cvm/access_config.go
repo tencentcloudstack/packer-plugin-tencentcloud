@@ -159,7 +159,8 @@ func (cf *TencentCloudAccessConfig) Prepare(ctx *interpolate.Context) []error {
 		errs = append(errs, err)
 	}
 
-	if cf.CvmEndpoint == "" || cf.VpcEndpoint == "" || cf.TagEndpoint == "" {
+	if !((cf.CvmEndpoint == "" && cf.VpcEndpoint == "" && cf.TagEndpoint == "") ||
+		(cf.CvmEndpoint != "" && cf.VpcEndpoint != "" && cf.TagEndpoint != "")) {
 		errs = append(errs, fmt.Errorf("parameter cvm_endpoint, vpc_endpoint and tag_endpoint must be set simultaneously"))
 	}
 
