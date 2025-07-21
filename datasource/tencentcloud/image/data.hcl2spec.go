@@ -25,6 +25,7 @@ type FlatConfig struct {
 	CvmEndpoint          *string                         `mapstructure:"cvm_endpoint" required:"false" cty:"cvm_endpoint" hcl:"cvm_endpoint"`
 	VpcEndpoint          *string                         `mapstructure:"vpc_endpoint" required:"false" cty:"vpc_endpoint" hcl:"vpc_endpoint"`
 	TagEndpoint          *string                         `mapstructure:"tag_endpoint" required:"false" cty:"tag_endpoint" hcl:"tag_endpoint"`
+	OrgEndpoint          *string                         `mapstructure:"org_endpoint" required:"false" cty:"org_endpoint" hcl:"org_endpoint"`
 	SecurityToken        *string                         `mapstructure:"security_token" required:"false" cty:"security_token" hcl:"security_token"`
 	AssumeRole           *cvm.FlatTencentCloudAccessRole `mapstructure:"assume_role" required:"false" cty:"assume_role" hcl:"assume_role"`
 	Profile              *string                         `mapstructure:"profile" required:"false" cty:"profile" hcl:"profile"`
@@ -60,6 +61,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"cvm_endpoint":               &hcldec.AttrSpec{Name: "cvm_endpoint", Type: cty.String, Required: false},
 		"vpc_endpoint":               &hcldec.AttrSpec{Name: "vpc_endpoint", Type: cty.String, Required: false},
 		"tag_endpoint":               &hcldec.AttrSpec{Name: "tag_endpoint", Type: cty.String, Required: false},
+		"org_endpoint":               &hcldec.AttrSpec{Name: "org_endpoint", Type: cty.String, Required: false},
 		"security_token":             &hcldec.AttrSpec{Name: "security_token", Type: cty.String, Required: false},
 		"assume_role":                &hcldec.BlockSpec{TypeName: "assume_role", Nested: hcldec.ObjectSpec((*cvm.FlatTencentCloudAccessRole)(nil).HCL2Spec())},
 		"profile":                    &hcldec.AttrSpec{Name: "profile", Type: cty.String, Required: false},

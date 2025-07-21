@@ -17,6 +17,11 @@ import (
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 	"github.com/hashicorp/packer-plugin-sdk/template/config"
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
+	cam "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cam/v20190116"
+	vm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
+	org "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/organization/v20210331"
+	tag "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tag/v20180813"
+	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 )
 
 const BuilderId = "tencent.cloud"
@@ -75,16 +80,18 @@ func (b *Builder) Prepare(raws ...interface{}) ([]string, []string, error) {
 }
 
 func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook) (packersdk.Artifact, error) {
-	cvmClient, vpcClient, tagClient, err := b.config.Client()
+	clientMap, err := b.config.Client()
 	if err != nil {
 		return nil, err
 	}
 
 	state := new(multistep.BasicStateBag)
 	state.Put("config", &b.config)
-	state.Put("cvm_client", cvmClient)
-	state.Put("vpc_client", vpcClient)
-	state.Put("tag_client", tagClient)
+	state.Put("cvm_client", clientMap["cvm_client"].(*vm.Client))
+	state.Put("vpc_client", clientMap["vpc_client"].(*vpc.Client))
+	state.Put("tag_client", clientMap["tag_client"].(*tag.Client))
+	state.Put("org_client", clientMap["org_client"].(*org.Client))
+	state.Put("cam_client", clientMap["cam_client"].(*cam.Client))
 	state.Put("hook", hook)
 	state.Put("ui", ui)
 
@@ -155,6 +162,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		},
 		&stepShareImage{
 			b.config.ImageShareAccounts,
+			b.config.IsShareOrgMembers,
 		},
 		&stepCopyImage{
 			DestinationRegions: b.config.ImageCopyRegions,
@@ -177,7 +185,7 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 	artifact := &Artifact{
 		TencentCloudImages: state.Get("tencentcloudimages").(map[string]string),
 		BuilderIdValue:     BuilderId,
-		Client:             cvmClient,
+		Client:             clientMap["cvm_client"].(*vm.Client),
 		StateData:          map[string]interface{}{"generated_data": state.Get("generated_data")},
 	}
 

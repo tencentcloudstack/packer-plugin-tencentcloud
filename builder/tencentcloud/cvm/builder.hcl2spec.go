@@ -25,6 +25,7 @@ type FlatConfig struct {
 	CvmEndpoint               *string                     `mapstructure:"cvm_endpoint" required:"false" cty:"cvm_endpoint" hcl:"cvm_endpoint"`
 	VpcEndpoint               *string                     `mapstructure:"vpc_endpoint" required:"false" cty:"vpc_endpoint" hcl:"vpc_endpoint"`
 	TagEndpoint               *string                     `mapstructure:"tag_endpoint" required:"false" cty:"tag_endpoint" hcl:"tag_endpoint"`
+	OrgEndpoint               *string                     `mapstructure:"org_endpoint" required:"false" cty:"org_endpoint" hcl:"org_endpoint"`
 	SecurityToken             *string                     `mapstructure:"security_token" required:"false" cty:"security_token" hcl:"security_token"`
 	AssumeRole                *FlatTencentCloudAccessRole `mapstructure:"assume_role" required:"false" cty:"assume_role" hcl:"assume_role"`
 	Profile                   *string                     `mapstructure:"profile" required:"false" cty:"profile" hcl:"profile"`
@@ -38,6 +39,8 @@ type FlatConfig struct {
 	ImageTags                 map[string]string           `mapstructure:"image_tags" required:"false" cty:"image_tags" hcl:"image_tags"`
 	SnapshotTags              map[string]string           `mapstructure:"snapshot_tags" required:"false" cty:"snapshot_tags" hcl:"snapshot_tags"`
 	SkipCreateImage           *bool                       `mapstructure:"skip_create_image" required:"false" cty:"skip_create_image" hcl:"skip_create_image"`
+	IsShareOrgMembers         *bool                       `mapstructure:"is_share_org_members" required:"false" cty:"is_share_org_members" hcl:"is_share_org_members"`
+	ImageFamily               *string                     `mapstructure:"image_family" required:"false" cty:"image_family" hcl:"image_family"`
 	AssociatePublicIpAddress  *bool                       `mapstructure:"associate_public_ip_address" required:"false" cty:"associate_public_ip_address" hcl:"associate_public_ip_address"`
 	SourceImageId             *string                     `mapstructure:"source_image_id" required:"false" cty:"source_image_id" hcl:"source_image_id"`
 	SourceImageName           *string                     `mapstructure:"source_image_name" required:"false" cty:"source_image_name" hcl:"source_image_name"`
@@ -145,6 +148,7 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"cvm_endpoint":                 &hcldec.AttrSpec{Name: "cvm_endpoint", Type: cty.String, Required: false},
 		"vpc_endpoint":                 &hcldec.AttrSpec{Name: "vpc_endpoint", Type: cty.String, Required: false},
 		"tag_endpoint":                 &hcldec.AttrSpec{Name: "tag_endpoint", Type: cty.String, Required: false},
+		"org_endpoint":                 &hcldec.AttrSpec{Name: "org_endpoint", Type: cty.String, Required: false},
 		"security_token":               &hcldec.AttrSpec{Name: "security_token", Type: cty.String, Required: false},
 		"assume_role":                  &hcldec.BlockSpec{TypeName: "assume_role", Nested: hcldec.ObjectSpec((*FlatTencentCloudAccessRole)(nil).HCL2Spec())},
 		"profile":                      &hcldec.AttrSpec{Name: "profile", Type: cty.String, Required: false},
@@ -158,6 +162,8 @@ func (*FlatConfig) HCL2Spec() map[string]hcldec.Spec {
 		"image_tags":                   &hcldec.AttrSpec{Name: "image_tags", Type: cty.Map(cty.String), Required: false},
 		"snapshot_tags":                &hcldec.AttrSpec{Name: "snapshot_tags", Type: cty.Map(cty.String), Required: false},
 		"skip_create_image":            &hcldec.AttrSpec{Name: "skip_create_image", Type: cty.Bool, Required: false},
+		"is_share_org_members":         &hcldec.AttrSpec{Name: "is_share_org_members", Type: cty.Bool, Required: false},
+		"image_family":                 &hcldec.AttrSpec{Name: "image_family", Type: cty.String, Required: false},
 		"associate_public_ip_address":  &hcldec.AttrSpec{Name: "associate_public_ip_address", Type: cty.Bool, Required: false},
 		"source_image_id":              &hcldec.AttrSpec{Name: "source_image_id", Type: cty.String, Required: false},
 		"source_image_name":            &hcldec.AttrSpec{Name: "source_image_name", Type: cty.String, Required: false},
