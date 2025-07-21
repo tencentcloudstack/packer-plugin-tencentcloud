@@ -14,10 +14,12 @@ import (
 	"github.com/hashicorp/packer-plugin-sdk/multistep"
 	packersdk "github.com/hashicorp/packer-plugin-sdk/packer"
 	"github.com/hashicorp/packer-plugin-sdk/retry"
+	cam "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cam/v20190116"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
 	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
+	org "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/organization/v20210331"
 	sts "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sts/v20180813"
 	tag "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tag/v20180813"
 	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
@@ -177,6 +179,35 @@ func NewTagClient(cf *TencentCloudAccessConfig) (client *tag.Client, err error) 
 		return nil, err
 	}
 	client = apiV3Conn.UseTagClient(tagClientProfile)
+
+	return
+}
+
+// NewVpcClient returns a new organization client
+func NewOrgClient(cf *TencentCloudAccessConfig) (client *org.Client, err error) {
+	apiV3Conn, err := packerConfigClient(cf)
+	if err != nil {
+		return nil, err
+	}
+
+	orgClientProfile, err := newClientProfile(cf.OrgEndpoint)
+	if err != nil {
+		return nil, err
+	}
+
+	client = apiV3Conn.UseOrgClient(orgClientProfile)
+
+	return
+}
+
+// NewCamClient returns a new cam client
+func NewCamClient(cf *TencentCloudAccessConfig) (client *cam.Client, err error) {
+	apiV3Conn, err := packerConfigClient(cf)
+	if err != nil {
+		return nil, err
+	}
+
+	client = apiV3Conn.UseCamClient()
 
 	return
 }

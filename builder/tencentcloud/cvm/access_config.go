@@ -12,9 +12,6 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/packer-plugin-sdk/template/interpolate"
-	cvm "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/cvm/v20170312"
-	tag "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/tag/v20180813"
-	vpc "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/vpc/v20170312"
 )
 
 const (
@@ -85,6 +82,9 @@ type TencentCloudAccessConfig struct {
 	// The endpoint you want to reach the cloud endpoint,
 	// if tce cloud you should set a tce tag endpoint.
 	TagEndpoint string `mapstructure:"tag_endpoint" required:"false"`
+	// The endpoint you want to reach the cloud endpoint,
+	// if tce cloud you should set a tce organization endpoint.
+	OrgEndpoint string `mapstructure:"org_endpoint" required:"false"`
 	// The region validation can be skipped if this value is true, the default
 	// value is false.
 	skipValidation bool
@@ -125,31 +125,42 @@ type TencentCloudAccessRole struct {
 	SessionDuration int `mapstructure:"session_duration" required:"false"`
 }
 
-func (cf *TencentCloudAccessConfig) Client() (*cvm.Client, *vpc.Client, *tag.Client, error) {
+func (cf *TencentCloudAccessConfig) Client() (map[string]interface{}, error) {
 	var (
-		err        error
-		cvm_client *cvm.Client
-		vpc_client *vpc.Client
-		tag_client *tag.Client
+		err error
+		// cvm_client *cvm.Client
+		// vpc_client *vpc.Client
+		// tag_client *tag.Client
+		// org_client *org.Client
+		// cam_client *cam.Client
 	)
 
 	if err = cf.validateRegion(); err != nil {
-		return nil, nil, nil, err
+		return nil, err
 	}
 
-	if cvm_client, err = NewCvmClient(cf); err != nil {
-		return nil, nil, nil, err
+	clientMap := map[string]interface{}{}
+	if clientMap["cvm_client"], err = NewCvmClient(cf); err != nil {
+		return nil, err
 	}
 
-	if vpc_client, err = NewVpcClient(cf); err != nil {
-		return nil, nil, nil, err
+	if clientMap["vpc_client"], err = NewVpcClient(cf); err != nil {
+		return nil, err
 	}
 
-	if tag_client, err = NewTagClient(cf); err != nil {
-		return nil, nil, nil, err
+	if clientMap["tag_client"], err = NewTagClient(cf); err != nil {
+		return nil, err
 	}
 
-	return cvm_client, vpc_client, tag_client, nil
+	if clientMap["org_client"], err = NewOrgClient(cf); err != nil {
+		return nil, err
+	}
+
+	if clientMap["cam_client"], err = NewCamClient(cf); err != nil {
+		return nil, err
+	}
+
+	return clientMap, nil
 }
 
 func (cf *TencentCloudAccessConfig) Prepare(ctx *interpolate.Context) []error {

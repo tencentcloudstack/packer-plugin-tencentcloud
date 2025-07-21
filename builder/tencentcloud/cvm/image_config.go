@@ -37,6 +37,14 @@ type TencentCloudImageConfig struct {
 	skipValidation bool
 	// Skip creating an image. When set to true, you don't need to enter target image information, share, copy, etc. The default value is false.
 	SkipCreateImage bool `mapstructure:"skip_create_image" required:"false"`
+	// After creating the image,
+	// whether to share it with other accounts in the organization
+	// where the current account is located.
+	// The image can be copied to a maximum of 50 accounts,
+	// with ImageShareAccounts being the priority.
+	IsShareOrgMembers bool `mapstructure:"is_share_org_members" required:"false"`
+	// Image family. Example value: business-daily-update.
+	ImageFamily string `mapstructure:"image_family" required:"false"`
 }
 
 func (cf *TencentCloudImageConfig) Prepare(ctx *interpolate.Context) []error {

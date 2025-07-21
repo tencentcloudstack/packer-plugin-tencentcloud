@@ -62,6 +62,9 @@ a [communicator](/packer/docs/templates/legacy_json_templates/communicator) can 
 - `tag_endpoint` (string) - The endpoint you want to reach the cloud endpoint,
   if tce cloud you should set a tce tag endpoint.
 
+- `org_endpoint` (string) - The endpoint you want to reach the cloud endpoint,
+  if tce cloud you should set a tce organization endpoint.
+
 - `security_token` (string) - STS access token, can be set through template or by exporting
   as environment variable such as `export TENCENTCLOUD_SECURITY_TOKEN=value`.
 
@@ -107,6 +110,14 @@ a [communicator](/packer/docs/templates/legacy_json_templates/communicator) can 
 - `snapshot_tags` (map[string]string) - Key/value pair tags that will be applied to snapshot.
 
 - `skip_create_image` (bool) - Skip creating an image. When set to true, you don't need to enter target image information, share, copy, etc. The default value is false.
+
+- `is_share_org_members` (bool) - After creating the image,
+  whether to share it with other accounts in the organization
+  where the current account is located.
+  The image can be copied to a maximum of 50 accounts,
+  with ImageShareAccounts being the priority.
+
+- `image_family` (string) - Image family. Example value: business-daily-update.
 
 <!-- End of code generated from the comments of the TencentCloudImageConfig struct in builder/tencentcloud/cvm/image_config.go; -->
 

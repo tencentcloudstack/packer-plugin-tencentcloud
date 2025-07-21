@@ -19,4 +19,12 @@
 
 - `skip_create_image` (bool) - Skip creating an image. When set to true, you don't need to enter target image information, share, copy, etc. The default value is false.
 
+- `is_share_org_members` (bool) - After creating the image,
+  whether to share it with other accounts in the organization
+  where the current account is located.
+  The image can be copied to a maximum of 50 accounts,
+  with ImageShareAccounts being the priority.
+
+- `image_family` (string) - Image family. Example value: business-daily-update.
+
 <!-- End of code generated from the comments of the TencentCloudImageConfig struct in builder/tencentcloud/cvm/image_config.go; -->
