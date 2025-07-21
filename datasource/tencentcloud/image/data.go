@@ -105,10 +105,12 @@ func (d *Datasource) Execute() (cty.Value, error) {
 }
 
 func (d *Datasource) ResolveImageByFilters() (*cvm.Image, error) {
-	client, _, _, err := d.config.Client()
+	clientMap, err := d.config.Client()
 	if err != nil {
 		return nil, err
 	}
+
+	cvmClient := clientMap["cvm_client"].(*cvm.Client)
 
 	req := cvm.NewDescribeImagesRequest()
 
@@ -127,7 +129,7 @@ func (d *Datasource) ResolveImageByFilters() (*cvm.Image, error) {
 	var resp *cvm.DescribeImagesResponse
 	err = buildCvm.Retry(ctx, func(ctx context.Context) error {
 		var e error
-		resp, e = client.DescribeImages(req)
+		resp, e = cvmClient.DescribeImages(req)
 		return e
 	})
 	if err != nil {
@@ -150,10 +152,12 @@ func (d *Datasource) ResolveImageByFilters() (*cvm.Image, error) {
 }
 
 func (d *Datasource) ResolveImageByImageFamily() (*cvm.Image, error) {
-	client, _, _, err := d.config.Client()
+	clientMap, err := d.config.Client()
 	if err != nil {
 		return nil, err
 	}
+
+	cvmClient := clientMap["cvm_client"].(*cvm.Client)
 
 	var resp *cvm.DescribeImageFromFamilyResponse
 	req := cvm.NewDescribeImageFromFamilyRequest()
@@ -162,7 +166,7 @@ func (d *Datasource) ResolveImageByImageFamily() (*cvm.Image, error) {
 	ctx := context.TODO()
 	err = buildCvm.Retry(ctx, func(ctx context.Context) error {
 		var e error
-		resp, e = client.DescribeImageFromFamily(req)
+		resp, e = cvmClient.DescribeImageFromFamily(req)
 		return e
 	})
 
