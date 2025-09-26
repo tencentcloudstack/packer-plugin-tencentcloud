@@ -13,9 +13,7 @@ import (
 )
 
 type stepCheckSourceImage struct {
-	sourceImageId     string
-	sourceImageName   string
-	sourceImageFamily string
+	sourceImageId string
 }
 
 func (s *stepCheckSourceImage) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {

@@ -12,9 +12,8 @@ import (
 )
 
 type stepCheckSourceImageFamily struct {
-	sourceImageId     string
-	sourceImageName   string
-	sourceImageFamily string
+	sourceImageId   string
+	sourceImageName string
 }
 
 func (s *stepCheckSourceImageFamily) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {

@@ -104,12 +104,9 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		&stepCheckSourceImageFamily{
 			b.config.SourceImageId,
 			b.config.SourceImageName,
-			b.config.SourceImageFamily,
 		},
 		&stepCheckSourceImage{
 			b.config.SourceImageId,
-			b.config.SourceImageName,
-			b.config.SourceImageFamily,
 		},
 		&stepConfigKeyPair{
 			Debug:        b.config.PackerDebug,
