@@ -101,6 +101,10 @@ func (b *Builder) Run(ctx context.Context, ui packersdk.Ui, hook packersdk.Hook)
 		&stepPreValidate{
 			b.config.SkipCreateImage,
 		},
+		&stepCheckSourceImageFamily{
+			b.config.SourceImageId,
+			b.config.SourceImageName,
+		},
 		&stepCheckSourceImage{
 			b.config.SourceImageId,
 		},

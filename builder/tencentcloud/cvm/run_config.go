@@ -29,11 +29,17 @@ type TencentCloudRunConfig struct {
 	// Default value is `false`.
 	AssociatePublicIpAddress bool `mapstructure:"associate_public_ip_address" required:"false"`
 	// The base image id of Image you want to create
+	// You can also specify `source_image_family`. If both `source_image` and `source_image_family` are specified, `source_image` takes precedence.
 	// your customized image from.
 	SourceImageId string `mapstructure:"source_image_id" required:"false"`
 	// The base image name of Image you want to create your
-	// customized image from.Conflict with SourceImageId.
+	// customized image from.Conflict with SourceImageId and SourceImageName.
 	SourceImageName string `mapstructure:"source_image_name" required:"false"`
+	// The source image family to use to create the new image from.
+	// The image family always returns its latest image that is not deprecated.
+	// Conflict with SourceImageId and SourceImageName. It takes effect when SourceImageId and SourceImageName are empty.
+	// Example value: business-daily-update.
+	SourceImageFamily string `mapstructure:"source_image_family" required:"false"`
 	// Charge type of cvm, values can be `POSTPAID_BY_HOUR` (default) `SPOTPAID`
 	InstanceChargeType string `mapstructure:"instance_charge_type" required:"false"`
 	// The instance type your cvm will be launched by.
@@ -133,8 +139,8 @@ func (cf *TencentCloudRunConfig) Prepare(ctx *interpolate.Context) []error {
 		errs = append(errs, errors.New("zone must be specified"))
 	}
 
-	if cf.SourceImageId == "" && cf.SourceImageName == "" {
-		errs = append(errs, errors.New("source_image_id or source_image_name must be specified"))
+	if cf.SourceImageId == "" && cf.SourceImageName == "" && cf.SourceImageFamily == "" {
+		errs = append(errs, errors.New("source_image_id or source_image_name or source_image_family must be specified"))
 	}
 
 	if cf.SourceImageId != "" && !CheckResourceIdFormat("img", cf.SourceImageId) {
