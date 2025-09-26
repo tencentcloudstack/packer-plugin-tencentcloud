@@ -4,10 +4,16 @@
   Default value is `false`.
 
 - `source_image_id` (string) - The base image id of Image you want to create
+  You can also specify `source_image_family`. If both `source_image` and `source_image_family` are specified, `source_image` takes precedence.
   your customized image from.
 
 - `source_image_name` (string) - The base image name of Image you want to create your
-  customized image from.Conflict with SourceImageId.
+  customized image from.Conflict with SourceImageId and SourceImageName.
+
+- `source_image_family` (string) - The source image family to use to create the new image from.
+  The image family always returns its latest image that is not deprecated.
+  Conflict with SourceImageId and SourceImageName. It takes effect when SourceImageId and SourceImageName are empty.
+  Example value: business-daily-update.
 
 - `instance_charge_type` (string) - Charge type of cvm, values can be `POSTPAID_BY_HOUR` (default) `SPOTPAID`
 
