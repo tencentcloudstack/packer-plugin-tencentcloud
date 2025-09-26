@@ -39,7 +39,7 @@ type TencentCloudRunConfig struct {
 	// The image family always returns its latest image that is not deprecated.
 	// Conflict with SourceImageId and SourceImageName. It takes effect when SourceImageId and SourceImageName are empty.
 	// Example value: business-daily-update.
-	SourceImageFamily string `mapstructure:"image_family" required:"false"`
+	SourceImageFamily string `mapstructure:"source_image_family" required:"false"`
 	// Charge type of cvm, values can be `POSTPAID_BY_HOUR` (default) `SPOTPAID`
 	InstanceChargeType string `mapstructure:"instance_charge_type" required:"false"`
 	// The instance type your cvm will be launched by.

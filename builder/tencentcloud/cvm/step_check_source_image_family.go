@@ -27,7 +27,7 @@ func (s *stepCheckSourceImageFamily) Run(ctx context.Context, state multistep.St
 	Say(state, config.SourceImageFamily, "Try to check the source image and get the latest valid image of the image family")
 
 	req := cvm.NewDescribeImageFromFamilyRequest()
-	req.ImageFamily = &config.InstanceType
+	req.ImageFamily = &config.SourceImageFamily
 
 	var resp *cvm.DescribeImageFromFamilyResponse
 	err := Retry(ctx, func(ctx context.Context) error {
@@ -39,15 +39,15 @@ func (s *stepCheckSourceImageFamily) Run(ctx context.Context, state multistep.St
 		return Halt(state, err, "Failed to get source image info from the image family")
 	}
 
-	image := resp.Response.Image
-	if image != nil {
+	if resp != nil && resp.Response != nil && resp.Response.Image != nil {
+		image := resp.Response.Image
 		if image.ImageId != nil && !*image.ImageDeprecated {
-			state.Put("source_image", image.ImageId)
+			state.Put("source_image", image)
 			Message(state, fmt.Sprintf("Get the latest image from the image family, id: %v", *image.ImageId), "Image found")
 			return multistep.ActionContinue
 		}
 	} else {
-		return Halt(state, err, "Failed to get source image info from the image family")
+		return Halt(state, fmt.Errorf("failed to get source image: %v", resp.ToJsonString()), "No image family found")
 	}
 
 	return Halt(state, fmt.Errorf("No image found under current instance_type(%s) restriction", config.InstanceType), "")

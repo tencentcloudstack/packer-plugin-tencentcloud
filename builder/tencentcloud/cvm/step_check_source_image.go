@@ -19,9 +19,6 @@ type stepCheckSourceImage struct {
 }
 
 func (s *stepCheckSourceImage) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
-	if s.sourceImageId == "" && s.sourceImageName == "" && s.sourceImageFamily != "" {
-		return multistep.ActionContinue
-	}
 	var (
 		imageNameRegex *regexp.Regexp
 		err            error
