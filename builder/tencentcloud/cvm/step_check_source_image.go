@@ -13,10 +13,15 @@ import (
 )
 
 type stepCheckSourceImage struct {
-	sourceImageId string
+	sourceImageId     string
+	sourceImageName   string
+	sourceImageFamily string
 }
 
 func (s *stepCheckSourceImage) Run(ctx context.Context, state multistep.StateBag) multistep.StepAction {
+	if s.sourceImageId == "" && s.sourceImageName == "" && s.sourceImageFamily != "" {
+		return multistep.ActionContinue
+	}
 	var (
 		imageNameRegex *regexp.Regexp
 		err            error
