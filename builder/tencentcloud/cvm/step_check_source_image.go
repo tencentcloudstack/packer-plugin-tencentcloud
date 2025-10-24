@@ -23,6 +23,7 @@ func (s *stepCheckSourceImage) Run(ctx context.Context, state multistep.StateBag
 	)
 	config := state.Get("config").(*Config)
 	client := state.Get("cvm_client").(*cvm.Client)
+	source_image := state.Get("source_image").(*cvm.Image)
 
 	Say(state, config.SourceImageId, "Trying to check source image")
 
@@ -30,6 +31,8 @@ func (s *stepCheckSourceImage) Run(ctx context.Context, state multistep.StateBag
 	req.InstanceType = &config.InstanceType
 	if config.SourceImageId != "" {
 		req.ImageIds = []*string{&config.SourceImageId}
+	} else if *source_image.ImageId != "" {
+		req.ImageIds = []*string{source_image.ImageId}
 	} else {
 		imageNameRegex, err = regexp.Compile(config.SourceImageName)
 		if err != nil {
