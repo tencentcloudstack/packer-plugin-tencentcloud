@@ -55,7 +55,7 @@ func (s *stepRunInstance) Run(ctx context.Context, state multistep.StateBag) mul
 		return Halt(state, err, "Failed to get user_data")
 	}
 
-	Say(state, "Trying to create a new instance", "")
+	Say(state, *source_image.ImageId, "Try to create a new instance based on image")
 
 	// config RunInstances parameters
 	req := cvm.NewRunInstancesRequest()
