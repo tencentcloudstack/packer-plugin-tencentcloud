@@ -34,7 +34,7 @@ func (me *TencentCloudClient) UseVpcClient(cpf *profile.ClientProfile) *vpc.Clie
 	}
 
 	me.vpcConn, _ = vpc.NewClient(me.Credential, me.Region, cpf)
-	// me.vpcConn.WithHttpTransport(&LogRoundTripper{})
+	me.vpcConn.WithHttpTransport(&LogRoundTripper{})
 
 	return me.vpcConn
 }
@@ -45,6 +45,7 @@ func (me *TencentCloudClient) UseCvmClient(cpf *profile.ClientProfile) *cvm.Clie
 	}
 
 	me.cvmConn, _ = cvm.NewClient(me.Credential, me.Region, cpf)
+	me.cvmConn.WithHttpTransport(&LogRoundTripper{})
 
 	return me.cvmConn
 }
@@ -56,6 +57,7 @@ func (me *TencentCloudClient) UseStsClient() *sts.Client {
 
 	cpf := me.ClientProfile
 	me.stsConn, _ = sts.NewClient(me.Credential, me.Region, cpf)
+	me.stsConn.WithHttpTransport(&LogRoundTripper{})
 
 	return me.stsConn
 }
@@ -66,6 +68,7 @@ func (me *TencentCloudClient) UseTagClient(cpf *profile.ClientProfile) *tag.Clie
 	}
 
 	me.tagConn, _ = tag.NewClient(me.Credential, me.Region, cpf)
+	me.tagConn.WithHttpTransport(&LogRoundTripper{})
 
 	return me.tagConn
 }
@@ -76,6 +79,7 @@ func (me *TencentCloudClient) UseOrgClient(cpf *profile.ClientProfile) *org.Clie
 	}
 
 	me.orgConn, _ = org.NewClient(me.Credential, me.Region, cpf)
+	me.orgConn.WithHttpTransport(&LogRoundTripper{})
 
 	return me.orgConn
 }
@@ -87,6 +91,7 @@ func (me *TencentCloudClient) UseCamClient() *cam.Client {
 
 	cpf := me.ClientProfile
 	me.camConn, _ = cam.NewClient(me.Credential, me.Region, cpf)
+	me.camConn.WithHttpTransport(&LogRoundTripper{})
 
 	return me.camConn
 }
